@@ -17,17 +17,35 @@ use Inertia\Inertia;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    // return Inertia::render('Welcome', [
+    //     'canLogin' => Route::has('login'),
+    //     'canRegister' => Route::has('register'),
+    //     'laravelVersion' => Application::VERSION,
+    //     'phpVersion' => PHP_VERSION,
+    // ]);
+    return redirect()->route('clients.index');
 });
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::group(['prefix' => 'clients'], function () {
+    Route::get('/', [App\Http\Controllers\ClientController::class, 'index'])->name('clients.index');
+    Route::get('/create', [App\Http\Controllers\ClientController::class, 'create'])->name('clients.create');
+    Route::post('/', [App\Http\Controllers\ClientController::class, 'store'])->name('clients.store');
+
+    Route::get('/{client}', [App\Http\Controllers\ClientController::class, 'show'])->name('clients.show');
+
+    // Edit route (optional, assuming a dedicated edit form)
+    // Route::get('/{client}/edit', [App\Http\Controllers\ClientController::class, 'edit'])->name('clients.edit');
+
+    // Update route (handled using Inertia.put in the modal component)
+    Route::post('save/{client}', [App\Http\Controllers\ClientController::class, 'update'])->name('clients.update');
+
+    Route::delete('/{client}', [App\Http\Controllers\ClientController::class, 'destroy'])->name('clients.destroy');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
